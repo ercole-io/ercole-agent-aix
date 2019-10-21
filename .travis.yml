@@ -4,6 +4,12 @@ language: perl
 perl:
   - "5.26"
 
+apt:
+  - ruby 
+  - ruby-dev 
+  - rubygems 
+  - build-essential
+
 branches:
   except:
     - /^latest$/
@@ -15,11 +21,13 @@ before_install:
   - echo ${VERSION}
 
 install:
-  - 
+  - gem install --no-ri --no-rdoc fpm
 script:
   - sed "s/\"latest\"/\"${VERSION}\"/" ercole-agent > /tmp/ercole-agent
   - cp /tmp/ercole-agent ercole-agent
   - tar -C . -cvzf /tmp/out/ercole-agent-aix-${VERSION}.tar.gz .
+  - fpm -n ercole-agent -s dir -x ".git" -x ".travis.yml" -x "README.md" -x "LICENSE" -t rpm --prefix /opt/ercole-agent-aix -a all --rpm-os aix6.1 --package /tmp/out --version ${VERSION} --name ercole-agent-aix .
+  - mv /tmp/out/ercole-agent-aix-${VERSION}-1.noarch.rpm /tmp/out/ercole-agent-aix-${VERSION}-1.noarch.rpm
 
 before_deploy:
   - if [[ ${VERSION} == "latest" ]]; then git tag -f latest; fi
