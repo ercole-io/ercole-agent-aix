@@ -14,6 +14,8 @@ before_install:
   - echo ${TRAVIS_TAG}
   - echo ${VERSION}
 
+install:
+  - 
 script:
   - sed "s/\"latest\"/\"${VERSION}\"/" ercole-agent > /tmp/ercole-agent
   - cp /tmp/ercole-agent ercole-agent
