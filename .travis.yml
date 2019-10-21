@@ -4,11 +4,13 @@ language: perl
 perl:
   - "5.26"
 
-apt:
-  - ruby 
-  - ruby-dev 
-  - rubygems 
-  - build-essential
+addons:
+  apt:
+    packages:
+      - ruby 
+      - ruby-dev 
+      - rubygems 
+      - build-essential
 
 branches:
   except:
