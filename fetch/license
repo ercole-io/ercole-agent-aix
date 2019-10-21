@@ -70,25 +70,9 @@ exit
 EOF
 )
 
-LICENSING_CPU_CORES=$(grep processor /proc/cpuinfo | wc -l)
-
-if [[ "$TYPE" == 'OVM' || "$TYPE" == 'VMWARE' || "$TYPE" == 'VMOTHER' ]]; then
-  if [[ $DB_VERSION == 'EXE' || $DB_VERSION == 'ENT' ]]; then
-    CORE_FACTOR=$(echo 0.25*$LICENSING_CPU_CORES|bc)
-    FACTOR=0.25
-  elif [[ $DB_VERSION == 'STD' ]]; then
-    CORE_FACTOR=0
-    FACTOR=0
-  fi
-elif [ $TYPE == 'PH' ]; then
-  if [[ $DB_VERSION == 'EXE' || $DB_VERSION == 'ENT' ]]; then
-    CORE_FACTOR=$(echo 0.25*$LICENSING_CPU_CORES|bc)
-    FACTOR=0.25
-  elif [[ $DB_VERSION == 'STD' ]]; then
-    CORE_FACTOR=$(cat /proc/cpuinfo |grep -i "physical id" |sort -n|uniq|wc -l)
-    FACTOR=$(cat /proc/cpuinfo |grep -i "physical id" |sort -n|uniq|wc -l)
-  fi
-fi
+LICENSING_CPU_CORES=$(lscfg -vp|grep proc|wc -l)
+CORE_FACTOR=$(echo $LICENCING_CPU_CORES)
+FACTOR=1
 
 if [[ $DB_VERSION == 'EXE' ]]; then
   echo "Oracle EXE; $CORE_FACTOR;"
