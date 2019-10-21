@@ -37,7 +37,7 @@ script:
   - cp /tmp/ercole-agent ercole-agent
   - tar -C . -cvzf /tmp/out/ercole-agent-aix-${VERSION}.tar.gz .
   - docker exec -it package_builder /bin/sh -c "cd ${WORKSPACE} && fpm -n ercole-agent -s dir -x '.git' -x '.travis.yml' -x 'README.md' -x 'LICENSE' -t rpm --prefix /opt/ercole-agent-aix -a all --rpm-os ${DIST} --version ${VERSION} --name ercole-agent-aix ." 
-  - mv ercole-agent-aix-${VERSION}-1.noarch.rpm /tmp/out/ercole-agent-aix-${VERSION}-1.noarch.rpm
+  - mv ercole-agent-aix-${VERSION}-1.noarch.rpm /tmp/out/ercole-agent-aix-${VERSION}-1.${OS}.noarch.rpm
 
 before_deploy:
   - if [[ ${VERSION} == "latest" ]]; then git tag -f latest; fi
