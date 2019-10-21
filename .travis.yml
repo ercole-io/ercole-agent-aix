@@ -36,7 +36,7 @@ script:
   - sed "s/\"latest\"/\"${VERSION}\"/" ercole-agent > /tmp/ercole-agent
   - cp /tmp/ercole-agent ercole-agent
   - tar -C . -cvzf /tmp/out/ercole-agent-aix-${VERSION}.tar.gz .
-  - docker exec -it package_builder /bin/sh -c "cd ${WORKSPACE} && fpm -n ercole-agent -s dir -x '.git' -x '.travis.yml' -x 'README.md' -x 'LICENSE' -t rpm --prefix /opt/ercole-agent-aix -a all --rpm-os ${DIST} --version ${VERSION} --name ercole-agent-aix ." 
+  - docker exec -it package_builder /bin/sh -c "cd ${WORKSPACE} && fpm -n ercole-agent -s dir -x '*.git*' -x '*.travis.yml*' -x '*README.md*' -x '*LICENSE*' -t rpm -a all --rpm-os ${DIST} --version ${VERSION} --name ercole-agent-aix ".=/opt/ercole-agent-aix" package/aix/ercole-agent=/etc/rc.d/init.d/" 
   - mv ercole-agent-aix-${VERSION}-1.noarch.rpm /tmp/out/ercole-agent-aix-${VERSION}-1.${DIST}.noarch.rpm
 
 before_deploy:
