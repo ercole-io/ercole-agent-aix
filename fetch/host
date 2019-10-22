@@ -48,6 +48,12 @@ else
   ORACLE_CLUSTER=N
 fi
 
+if [ -f "/usr/sbin/cluster/clstat" ]; then
+  AIX_CLUSTER=Y
+else
+  AIX_CLUSTER=N
+fi
+
 # CHECK_TYPE_SERVER_VMWARE=$(dmesg | grep VMware | wc -l)
 
 # if [ "$CHECK_TYPE_SERVER_VMWARE" -gt 0 ]; then
@@ -71,4 +77,5 @@ memorytotal: $MEM_TOTAL
 swaptotal: $SWP_TOTAL
 oraclecluster: $ORACLE_CLUSTER
 veritascluster: $VERITAS_CLUSTER
-suncluster: $SUN_CLUSTER" 
+suncluster: $SUN_CLUSTER
+aixcluster: $AIX_CLUSTER" 
