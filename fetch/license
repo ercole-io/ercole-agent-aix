@@ -49,12 +49,15 @@ export ORACLE_SID=$SID
 export ORACLE_HOME=$HOME
 export PATH=$HOME/bin:$PATH
 
-DB_VERSION=$(sqlplus -S / as sysdba << EOF
-set pages 0 feedback off
-select (case when UPPER(banner) like '%EXTREME%' then 'EXE' when UPPER(banner) like '%ENTERPRISE%' then 'ENT' else 'STD' end) as versione from v\$version where rownum=1;
-exit
+fn() {
+  sqlplus -S / as sysdba << EOF
+    set pages 0 feedback off
+    select (case when UPPER(banner) like '%EXTREME%' then 'EXE' when UPPER(banner) like '%ENTERPRISE%' then 'ENT' else 'EXE' end) as versione from v\$version where rownum=1;
+    exit
 EOF
-)
+}
+
+DB_VERSION=$(fn)
 
 DB_NAME=$(sqlplus -S / as sysdba << EOF
 set pages 0 feedback off
@@ -65,13 +68,13 @@ EOF
 
 DB_ONE=x$(sqlplus -S / as sysdba << EOF
 set pages 0 feedback off
-HOST srvctl config database -d $DB_NAME |grep -o One
+HOST srvctl config database -d $DB_NAME |grep -i One
 exit
 EOF
 )
 
 LICENSING_CPU_CORES=$(lscfg -vp|grep proc|wc -l)
-CORE_FACTOR=$(echo $LICENCING_CPU_CORES)
+CORE_FACTOR=$(echo $LICENSING_CPU_CORES)
 FACTOR=1
 
 if [[ $DB_VERSION == 'EXE' ]]; then
