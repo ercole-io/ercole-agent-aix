@@ -36,6 +36,7 @@ use database;
 use tablespaces;
 use schemas;
 use features;
+use features2;
 use licenses;
 use patches;
 use addms;
@@ -47,7 +48,7 @@ use MIME::Base64;
 use common;
  
 my $version = "latest";
-my $hostDataSchemaVersion = 3;
+my $hostDataSchemaVersion = 4;
 
 
 sub main {
@@ -123,8 +124,11 @@ sub buildData { #OK
 				$database{'Features'} = marshal::Features($out); #OK 
 			}
 
+			$out = fetcher("opt", $dbEntry{"DBName"}, $dbVersion, $dbEntry{"OracleHome"});
+			$database{'Features2'} = marshal::Features2($out); #OK 
 
-			$out = fetcher("license", $dbEntry{"DBName"}, $dbVersion, $host{'Type'}, $dbEntry{"OracleHome"});
+
+			$out = fetcher("license",$dbEntry{"DBName"}, $dbVersion, $host{'Type'}, $dbEntry{"OracleHome"});
 			$database{'Licenses'} = marshal::Licenses($out); #OK
 			
 			$out = fetcher("addm", $dbEntry{"DBName"}, $dbEntry{"OracleHome"});
