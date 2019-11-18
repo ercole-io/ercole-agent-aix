@@ -18,7 +18,7 @@
 HOSTNAME=$(hostname)
 KERNEL=$(oslevel -s)
 
-OS=$(uname -a)
+OS=$(uname -s -r -v -m)
 CPU_MODEL=$(prtconf 2>/dev/null |grep roces|grep -i type)
 SWP_TOTAL=$(lsps -s|tail -1 | awk '{print $1}'|awk -F "M" '{print $1/1024}')
 MEM_TOTAL=$(prtconf -m| awk '{print $3/1024}')
