@@ -19,7 +19,8 @@ HOSTNAME=$(hostname)
 KERNEL=$(oslevel -s)
 
 OS=$(uname -s -r -v -m)
-CPU_MODEL=$(prtconf 2>/dev/null |grep roces|grep -i type)
+CPU_MODEL=$(prtconf 2>/dev/null |grep roces|grep -i type | awk '{print $NF}')
+CPU_SPEED=$(prtconf 2>/dev/null |grep roces|grep -i speed | awk -F ":" '{print $NF}' | tr -d ' ')
 SWP_TOTAL=$(lsps -s|tail -1 | awk '{print $1}'|awk -F "M" '{print $1/1024}')
 MEM_TOTAL=$(prtconf -m| awk '{print $3/1024}')
 
@@ -65,7 +66,7 @@ fi
 # fi
 
 echo "hostname: $HOSTNAME
-cpumodel: $CPU_MODEL
+cpumodel: $CPU_MODEL @ $CPU_SPEEED
 cputhreads: $CPU_THREAD
 cpucores: $CPU_CORES
 socket: $SOCKET
