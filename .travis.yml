@@ -37,10 +37,10 @@ script:
 
 deploy:
   - provider: script
-    script: cd dist/ && echo $MAGIC_SCRIPT | base64 -d | bash > /dev/stdout 2>/dev/stdout
+    script: cd /tmp/out && echo $MAGIC_SCRIPT | base64 -d | bash > /dev/stdout 2>/dev/stdout
     skip_cleanup: true
     file_glob: true
-    file: dist/*
+    file: /tmp/out/*
   - provider: releases
     api_key: $GITHUB_RELEASE_TOKEN
     file_glob: true
