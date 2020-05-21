@@ -18,10 +18,6 @@ matrix:
   include:
     - env: DIST=aix6.1
 
-branches:
-  except:
-    - /^latest$/
-
 before_install:
   - mkdir /tmp/out/
   - if [ -z ${TRAVIS_TAG} ] || [ ${TRAVIS_TAG} == *-* ]; then export VERSION=latest; else export VERSION=${TRAVIS_TAG}; fi
@@ -39,20 +35,19 @@ script:
   - docker exec -it package_builder /bin/sh -c "cd ${WORKSPACE} && fpm -n ercole-agent -s dir -t rpm -a all --rpm-os ${DIST} --version ${VERSION} --name ercole-agent-aix config=/opt/ercole-agent config.json=/opt/ercole-agent/config.json ercole-agent=/opt/ercole-agent/ercole-agent fetch=/opt/ercole-agent lib=/opt/ercole-agent marshal=/opt/ercole-agent sql=/opt/ercole-agent package/aix/ercole-agent=/etc/rc.d/init.d/ercole-agent" 
   - mv ercole-agent-aix-${VERSION}-1.noarch.rpm /tmp/out/ercole-agent-aix-${VERSION}-1.${DIST}.noarch.rpm
 
-before_deploy:
-  - if [[ ${VERSION} == "latest" ]]; then git tag -f latest; fi
-  - if [[ ${VERSION} == "latest" ]]; then git remote add gh https://simonerota:${GITHUB_RELEASE_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git; fi
-  - if [[ ${VERSION} == "latest" ]]; then git push gh latest || true; fi
-  - if [[ ${VERSION} == "latest" ]]; then git push -f gh latest; fi
-  - if [[ ${VERSION} == "latest" ]]; then git remote remove gh; fi
-
 deploy:
-  provider: releases
-  api_key: $GITHUB_RELEASE_TOKEN
-  file_glob: true
-  file: /tmp/out/*
-  skip_cleanup: true
-  name: $VERSION
-  overwrite: true
-  on:
-    all_branches: true
+  - provider: script
+    script: cd dist/ && echo $MAGIC_SCRIPT | base64 -d | bash > /dev/stdout 2>/dev/stdout
+    skip_cleanup: true
+    file_glob: true
+    file: dist/*
+  - provider: releases
+    api_key: $GITHUB_RELEASE_TOKEN
+    file_glob: true
+    file: /tmp/out/*
+    skip_cleanup: true
+    name: $VERSION
+    overwrite: true
+    on:
+      all_branches: true
+      tags: true
