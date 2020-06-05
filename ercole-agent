@@ -35,7 +35,6 @@ use oratab;
 use database;
 use tablespaces;
 use schemas;
-use features;
 use features2;
 use licenses;
 use patches;
@@ -91,7 +90,7 @@ sub buildData { #OK
 			# 	fetcher("stats", $db, $dbVersion); #Update db stats
 			# }
 
-			$out = fetcher("db", $dbEntry{"DBName"}, $dbEntry{"OracleHome"}, $configuration{'AWR'}); 
+			$out = fetcher("db", $dbEntry{"DBName"}, $dbEntry{"OracleHome"}, $configuration{'AWR'});
 			my %database = marshal::Database($out); #OK 
 
 			$out = fetcher("tablespace", $dbEntry{"DBName"}, $dbEntry{"OracleHome"});
@@ -103,17 +102,6 @@ sub buildData { #OK
 			$out = fetcher("patch", $dbEntry{"DBName"}, $dbVersion, $dbEntry{"OracleHome"}); #empty, OK
 			$database{'Patches'} = marshal::Patches($out); #OK
 
-			$out = fetcher("feature", $dbEntry{"DBName"}, $dbVersion, $dbEntry{"OracleHome"});
-			if ($out =~ m/deadlocked on readable physical standby/) {
-				marshal::logPrintln("Detected bug active dataguard 2311894.1!");
-				$database{'Features'}=();
-			} elsif ($out =~ m/ORA-01555: snapshot too old: rollback segment number/) {
-				marshal::logPrintln("Detected error on active dataguard ORA-01555!");
-				$database{'Features'}=();
-			} else {
-				$database{'Features'} = marshal::Features($out); #OK 
-			}
-
 			$out = fetcher("opt", $dbEntry{"DBName"}, $dbVersion, $dbEntry{"OracleHome"});
 			$database{'Features2'} = marshal::Features2($out); #OK 
 
@@ -122,7 +110,12 @@ sub buildData { #OK
 			$database{'Licenses'} = marshal::Licenses($out); #OK
 			
 			$out = fetcher("addm", $dbEntry{"DBName"}, $dbEntry{"OracleHome"});
-			$database{'ADDMs'} = marshal::Addms($out); #OK 
+			if ($out =~ m/Diagnostic Package License is needed for using this feature./) {
+				marshal::logPrintln("Detected Diagnostic Package License is needed for using this feature error. Ignored!");
+				$database{'ADDMs'} = (); 
+			} else {
+				$database{'ADDMs'} = marshal::Addms($out); #OK 
+			}
 
 			$out = fetcher("segmentadvisor", $dbEntry{"DBName"}, $dbEntry{"OracleHome"});
 			$database{'SegmentAdvisors'} = marshal::SegmentAdvisor($out); #OK 
@@ -131,7 +124,12 @@ sub buildData { #OK
 			$database{'LastPSUs'} = marshal::PSU($out); #OK 
 
 			$out = fetcher("backup", $dbEntry{"DBName"}, $dbEntry{"OracleHome"});
-			$database{'Backups'} = marshal::Backups($out); #OK 
+			if ($out =~ m/unable to extend temp segment/) {
+				marshal::logPrintln("Detected unable to extend temp segment error. Ignored!");
+				$database{'Backups'}=();
+			} else {
+				$database{'Backups'} = marshal::Backups($out); #OK 
+			}
 
 			push (@databases, {%database}); #OK
 			
