@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2019 Sorint.lab S.p.A.
+# Copyright (c) 2020 Sorint.lab S.p.A.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,32 +23,31 @@ use diagnostics;
 use lib "./marshal";
 use common;
 
-# Backups returns a Backups hash from the output of the backups
-# fetcher command. Host fields output is in CSV format separated by '|||'
-sub Backups {
+#ClusterMembershipStatus returns a ClusterMembershipStatus struct from the output of the host
+#fetcher command. Host fields output is in key: value format separated by a newline
+sub ClusterMembershipStatus {
     no warnings 'uninitialized';
     my $cmdOutput = shift;
-    my @backups;
+    my %cms;
 
     for my $c (split /\n/, $cmdOutput) {
-        my %backup;
         my $line = $c;
-        my @weekDaysArray;
-        my ($backupType, $hour, $weekDays, $avgBckSize, $retention) = split /\|\|\|/, $line;
-        $backupType=trim($backupType);
-        $hour=trim($hour);
-        @weekDaysArray=split /,/, trim($weekDays);
-        $avgBckSize=parseNumber(trim($avgBckSize));
-        $retention=trim($retention);
-        $backup{'BackupType'} = $backupType;
-        $backup{'Hour'} = $hour;
-        $backup{'WeekDays'} = \@weekDaysArray;
-        $backup{'AvgBckSize'} = $avgBckSize;
-        $backup{'Retention'} = $retention;
-        push(@backups, {%backup});
+        my ($key, $value) = split /:/, $line;
+        $key=trim($key);
+        $key =~ s{(\w+)}{\u\L$1}g;
+        if ($key eq "Oraclecluster"){
+            $cms{"OracleClusterware"} = parseBool(trim($value));
+        } elsif ($key eq "Veritascluster"){
+            $cms{"VeritasClusterServer"} = parseBool(trim($value));
+        } elsif ($key eq "Suncluster"){
+            $cms{"SunCluster"} = parseBool(trim($value));
+        } elsif ($key eq "Aixcluster"){
+            $cms{"HACMP"} = parseBool(trim($value));
+        } 
+        $value=trim($value);
     }
 
-    return \@backups;
+    return %cms;
 }
 
 1;
