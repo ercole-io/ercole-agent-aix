@@ -16,16 +16,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 HOSTNAME=$(hostname)
-KERNEL=$(oslevel -s)
+KERNEL=AIX
+KERNEL_VERSION=$(oslevel -s)
 
-OS=$(uname -s -r -v -m)
+OS=AIX
+OS_VERSION=$(uname -r -v)
 CPU_MODEL=$(prtconf 2>/dev/null |grep roces|grep -i type | awk '{print $NF}')
 CPU_SPEED=$(prtconf 2>/dev/null |grep roces|grep -i speed | awk -F ":" '{print $NF}' | tr -d ' ')
+
 SWP_TOTAL=$(lsps -s|tail -1 | awk '{print $1}'|awk -F "M" '{print $1/1024}')
 MEM_TOTAL=$(prtconf -m| awk '{print $3/1024}')
 
 CPU_CORES=$(lscfg -vp|grep proc|wc -l)
 CPU_THREAD=$(($CPU_CORES * 4))
+THREADS_PER_CORE=4
+CORES_PER_SOCKET=$CPU_CORES
 SOCKET=1
 
 CHECK_SUN_CLUSTER=$(ps -ef | grep -v grep | grep rpc.pmfd|wc -l)
@@ -66,14 +71,19 @@ fi
 # fi
 
 echo "hostname: $HOSTNAME
-cpumodel: $CPU_MODEL @ $CPU_SPEEED
+cpumodel: $CPU_MODEL
 cputhreads: $CPU_THREAD
 cpucores: $CPU_CORES
-socket: $SOCKET
+cpufrequency: $CPU_SPEED
+cpusockets: $SOCKET
+threadspercore: $THREADS_PER_CORE
+corespersocket: $CORES_PER_SOCKET
 type: $TYPE
 virtual: $VIRTUAL
 kernel: $KERNEL
+kernelversion: $KERNEL_VERSION
 os: $OS
+osversion: $OS_VERSION
 memorytotal: $MEM_TOTAL
 swaptotal: $SWP_TOTAL
 oraclecluster: $ORACLE_CLUSTER

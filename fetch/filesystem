@@ -14,6 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-df -gv | sed 1d | awk '{if (NF==1) {line=$0;getline;sub(" *"," ");print line$0} else {print}}' | awk '{ printf "%s\t\t???\t\t%dG\t\t%dG\t\t%dG\t\t%s\t\t%s\n", $1, $2, $3, $4, $5, $9 }'
+df -gv | sed 1d | awk '{if (NF==1) {line=$0;getline;sub(" *"," ");print line$0} else {print}}' | awk '{ printf "%s\t\t???\t\t%d\t\t%d\t\t%d\t\t%s\t\t%s\n", $1, $2*1024*1024*1024, $3*1024*1024*1024, $4*1024*1024*1024, $5, $9 }'
 
 # bdf | sed 1d  | awk '{if (NF==1) {line=$0;getline;sub(" *"," ");print line$0} else {print}}' | awk '{ printf "%s\t\t???\t\t%fG\t\t%fG\t\t%fG\t\t%s\t\t%s\n", $1, $2/1024/1024, $3/1024/1024, $4/1024/1024, $5, $6 }'
